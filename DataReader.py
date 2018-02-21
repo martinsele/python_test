@@ -119,6 +119,7 @@ if __name__ == '__main__':
     reader = DataReader('./data')
     data, labels = reader.read_fx_data()
 
+
     print(data)
     print(labels)
     # eurUsd = read_fx_data_from_file('./data/fxhistoricaldata_EURUSD_hour.csv', formatSpec='%Y-%m-%d %H:%M:%S')
@@ -133,12 +134,16 @@ if __name__ == '__main__':
     # eurJpy = eurJpy.loc[startDate:].dropna()
     # eurChf = eurChf.loc[startDate:].dropna()
     #
+    for i in range(len(data)):
+        dat = data[i].pct_change()
+        plt.plot(dat['Close'])
+
     # plt.plot(eurUsd['Close'], label='USD')
     # plt.plot(eurChf['Close'], label='CHF')
     # plt.plot(eurGbp['Close'], label='GBP')
     # # plt.plot(eurJpy['Close'], label='JPY')
     # plt.legend()
-    # plt.show()
+    plt.show()
     #
     # scatData = pd.concat([eurUsd['Close'], eurGbp['Close'], eurJpy['Close'], eurChf['Close']], axis=1)
     # scatData.columns = ['usd', 'gbp', 'jpy', 'chf']
