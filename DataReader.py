@@ -14,11 +14,11 @@ class DataReader(object):
         self.dir = directory
 
     def read_fx_data_as_array(self):
-        '''
+        """
         Read various FX history data from given directory and merges them together. Remove times where not all data are present.
         :param dirStr:
         :return: numpy array of size is [TimeSteps, currencies, OHLC]); and labels of the individual DataFrames as dictionary
-        '''
+        """
         data, labels = self.read_fx_data()
         array_data = np.empty([0] + list(data[0].shape))
         for currencyDF in data:
@@ -30,12 +30,12 @@ class DataReader(object):
 
 
     def read_fx_data_from_file(self, fileName, formatSpec):
-        '''
+        """
         Read data from file given and return as pandas dataframe with datetime index and OpenHighLowClose data
         :param fileName:
         :param formatSpec:
         :return: DataFrame read from the file and its label
-        '''
+        """
         dataR = pd.read_csv(fileName, index_col=1)
         dataR.index = pd.to_datetime(dataR.index, format=formatSpec)
         dataR.sort_index(inplace=True)
@@ -45,11 +45,11 @@ class DataReader(object):
 
 
     def read_fx_data(self):
-        '''
+        """
         Read various FX history data from given directory and merges them together. Remove times where not all data are present.
         :param dirStr:
         :return: array of DataFrames each for given input data (size is [TimeSteps, OHLC]); and labels of the individual DataFrames as dictionary
-        '''
+        """
 
         dirStr = self.dir
 
