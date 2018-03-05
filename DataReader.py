@@ -135,8 +135,12 @@ if __name__ == '__main__':
     # eurChf = eurChf.loc[startDate:].dropna()
     #
     for i in range(len(data)):
-        dat = data[i].pct_change()
-        plt.plot(dat['Close'])
+        dat = data[i].pct_change(4)
+        plt.figure()
+        plt.title(labels[i])
+        # plt.xlim(-0.005, 0.005)
+        dat['Close'].hist(bins=100)
+        # plt.plot(dat['Close'])
 
     # plt.plot(eurUsd['Close'], label='USD')
     # plt.plot(eurChf['Close'], label='CHF')
