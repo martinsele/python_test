@@ -68,8 +68,9 @@ class FxDataGenerator(object):
         X = np.zeros([batch_size, self.time_samples] + list(self.data.shape[1:]))
         for i in range(batch_size):
             X[i, :, :, :] = self.data[rand_start[i]:rand_start[i]+self.time_samples, :, :]
-            if normalize:
-                X = self.normalize_data(X)
+
+        if normalize:
+            X = self.normalize_data(X)
 
         # prepare data labels
         y = self.get_data_labels_N_steps(rand_start,
@@ -214,14 +215,15 @@ class FxDataGenerator(object):
     def normalize_data(self, dataToNorm):
         """
         Normalize input data using the normalizationTool defined in constructor
-        :param dataToNorm: data to be normalize, size [:, currencies, OHLC]
+        :param dataToNorm: data to be normalize, size [batch_size, time_samples, currencies, OHLC]
         :return: normalized data of the same shape as the input
         """
 
         if self.normalizeTool:
             dataOut = np.zeros(dataToNorm.shape)
-            for i in range(dataToNorm.shape[1]):
-                    dataOut[:, i, :] = self.normalizeTool[i].fit_transform(dataToNorm[:, i, :])
+            for batch in range(dataToNorm.shape[0]):
+                for i in range(dataToNorm.shape[2]):
+                    dataOut[batch, :, i, :] = self.normalizeTool[i].fit_transform(dataToNorm[batch, :, i, :])
         else:
             dataOut = dataToNorm
 
