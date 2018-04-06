@@ -27,8 +27,6 @@ class DataReader(object):
         ret_array = np.transpose(array_data, (1, 0, 2))
         return ret_array, labels
 
-
-
     def read_fx_data_from_file(self, fileName, formatSpec):
         """
         Read data from file given and return as pandas dataframe with datetime index and OpenHighLowClose data
@@ -42,7 +40,6 @@ class DataReader(object):
         label = dataR['Name'][0]
         dataR.drop('Name', axis=1, inplace=True)
         return dataR, label
-
 
     def read_fx_data(self):
         """
@@ -81,9 +78,7 @@ class DataReader(object):
         return data, labels
 
 
-
     ######  VISUALIZE CANDLES  #######
-
     def visualizeCandles(self, data, ticks):
         dataStart = data.index[0]
         dataEnd = data.index[ticks]
@@ -114,14 +109,40 @@ class DataReader(object):
         plt.show()
         return
 
+    def fake_data_as_array(self, time_steps=10000, currencies_num=4, rand_seed=101):
+        """
+        Generate fake sine data for testing purposes.
+        :param time_steps: length of data
+        :param currencies_num: number of currencies in fake data
+        :return: numpy array of size is [TimeSteps, currencies, OLHC]); and labels of the individual DataFrames as dictionary
+        """
+        np.random.seed(rand_seed)
+        data = np.zeros((time_steps, currencies_num, 4))
+        time_scale = np.arange(0, time_steps, 1)
+        ones_array = np.ones(time_steps)
+        labels = {}
+        for idx in range(currencies_num):
+            labels[idx] = "fake_"+str(idx)
+            base_data = np.sin(time_scale/200)*np.sin(time_scale/20) + 1.1*ones_array + np.random.rand(1)*ones_array
+            for olhc in range(4):
+                data[:, idx, olhc] = base_data + olhc/4*ones_array
+
+        return data, labels
+
 
 if __name__ == '__main__':
     reader = DataReader('./data')
-    data, labels = reader.read_fx_data()
+    # data, labels = reader.read_fx_data()
+    data, labels = reader.fake_data_as_array()
+
+    for cur in range(3):
+        for olhc in range(4):
+            plt.plot(data[:, cur, olhc])
+    plt.show()
 
 
-    print(data)
-    print(labels)
+    # print(data)
+    # print(labels)
     # eurUsd = read_fx_data_from_file('./data/fxhistoricaldata_EURUSD_hour.csv', formatSpec='%Y-%m-%d %H:%M:%S')
     # eurGbp = read_fx_data_from_file('./data/fxhistoricaldata_EURGBP_hour.csv', formatSpec='%Y-%m-%d %H:%M:%S')
     # eurJpy = read_fx_data_from_file('./data/fxhistoricaldata_EURJPY_hour.csv', formatSpec='%Y-%m-%d %H:%M:%S')
@@ -134,13 +155,13 @@ if __name__ == '__main__':
     # eurJpy = eurJpy.loc[startDate:].dropna()
     # eurChf = eurChf.loc[startDate:].dropna()
     #
-    for i in range(len(data)):
-        dat = data[i].pct_change(4)
-        plt.figure()
-        plt.title(labels[i])
-        # plt.xlim(-0.005, 0.005)
-        dat['Close'].hist(bins=100)
-        # plt.plot(dat['Close'])
+    # for i in range(len(data)):
+    #     dat = data[i].pct_change(4)
+    #     plt.figure()
+    #     plt.title(labels[i])
+    #     # plt.xlim(-0.005, 0.005)
+    #     dat['Close'].hist(bins=100)
+    #     # plt.plot(dat['Close'])
 
     # plt.plot(eurUsd['Close'], label='USD')
     # plt.plot(eurChf['Close'], label='CHF')

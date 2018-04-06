@@ -113,8 +113,9 @@ class FxDataGenerator(object):
         X = np.zeros([new_batch_size, self.time_samples] + list(self.data.shape[1:]))
         for i in range(new_batch_size):
             X[i, :, :, :] = self.data[incremental_starts[i]:incremental_starts[i]+self.time_samples, :, :]
-            if normalize:
-                X = self.normalize_data(X)
+
+        if normalize:
+            X = self.normalize_data(X)
 
         # prepare data labels
         y = self.get_data_labels_N_steps(incremental_starts,
@@ -229,6 +230,28 @@ class FxDataGenerator(object):
 
         return dataOut
 
+    def get_classes_bias(self, pct_change_threshold, currency_idx):
+        """
+        Estimate classes weights to deal with unbalanced data classes
+        :param pct_change_threshold: threshold for classes identification
+        :param currency_idx: currency index the change of which is observed
+        :return: dictionary of classes and their weights
+        """
+        batch_size = 10
+        classes = np.zeros(3, )
+        num_iter = int(self.data.shape[0] * self.trainRatio / batch_size) + 1
+        for i in range(num_iter):
+            x, y = self.generate_rand_train_data(batch_size=batch_size,
+                                                 pct_change_threshold=pct_change_threshold,
+                                                 currency_idx=currency_idx)
+            classes[0] += sum(y[:, 0] == 1)
+            classes[1] += sum(y[:, 1] == 1)
+            classes[2] += sum(y[:, 2] == 1)
+
+        max_weight = max(classes)
+        classes_weight = {0: max_weight / classes[0], 1: max_weight / classes[1], 2: max_weight / classes[2]}
+        return classes_weight
+
     # def one_hot_encode(self, vec, vals=3):
     #     """
     #     Encode classification vector into binary matrix
@@ -243,9 +266,9 @@ class FxDataGenerator(object):
 
 
 if __name__ == '__main__':
-    x = np.array([1, 2, 4, 7, 1])
-    gen = FxDataGenerator(x)
-    shifted = gen.pct_change_N(x, 2)
+    a = np.array([1, 2, 4, 7, 1])
+    gen = FxDataGenerator(a)
+    shifted = gen.pct_change_N(a, 2)
     print(shifted)
 
 
